@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pizza Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #FCFCFC;
+      --red: #DB162F;
+      --yellow: #F5B82E;
+      --blue: #4D9DE0;
+      --dark: #36382E;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--dark);
+      font-family: 'Helvetica Neue', sans-serif;
+      padding: 40px;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    h1, h2 {
+      font-weight: 600;
+    }
+
+    button {
+      padding: 10px 15px;
+      font-size: 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    .btn-blue { background: var(--blue); color: white; }
+    .btn-yellow { background: var(--yellow); color: var(--dark); }
+    .btn-red { background: var(--red); color: white; }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      font-size: 14px;
+      margin-top: 6px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    .section {
+      margin-top: 40px;
+      display: none;
+    }
+
+    #orderOutput, #output, #verifyOutput, #ipfsLoadOutput {
+      white-space: pre-wrap;
+      background: #f5f5f5;
+      padding: 16px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .visible { display: block; }
+  </style>
+</head>
+<body>
+
+  <h1>🍕 Pizza Tracker dApp</h1>
+  <p>Select a mode:</p>
+  <button id="showCustomer" class="btn-red">Customer Portal</button>
+  <button id="showStore" class="btn-red">Store Dashboard</button>
+
+  <!-- CUSTOMER SECTION -->
+  <div id="customerSection" class="section">
+    <h2>Customer Portal</h2>
+    <label for="customerName">Your Name</label>
+    <input type="text" id="customerName" placeholder="e.g. Yogini" />
+
+    <label for="orderItems">Order Items</label>
+    <input type="text" id="orderItems" placeholder="e.g. Margherita, Garlic Knots" />
+
+    <button id="placeOrder" class="btn-blue">Submit Order</button>
+    <button id="downloadLatestOrder" class="btn-yellow">Download Latest Order</button>
+    <button class="btn-red" onclick="localStorage.removeItem('customerOrders'); alert('Customer orders cleared!')">Clear Orders</button>
+
+    <div id="orderOutput">Order status will appear here...</div>
+  </div>
+
+  <!-- STORE SECTION -->
+  <div id="storeSection" class="section">
+    <h2>Store Dashboard</h2>
+    <button id="connectWallet" class="btn-blue">Connect Wallet</button>
+    <div>Connected Address: <span id="walletAddress">Not connected</span></div>
+
+    <h3>Update Order Stage</h3>
+    <input type="number" id="orderId" placeholder="Enter Order ID" />
+    <select id="stageSelect">
+      <option value="Ordered">Ordered</option>
+      <option value="DoughMade">Dough Made</option>
+      <option value="ToppingsAdded">Toppings Added</option>
+      <option value="Baked">Baked</option>
+      <option value="OutForDelivery">Out for Delivery</option>
+      <option value="Delivered">Delivered</option>
+    </select>
+    <button id="signStageUpdate" class="btn-blue">Update Stage</button>
+    <button id="resetOrders" class="btn-red">Clear All Orders</button>
+    <button id="downloadJson" class="btn-yellow">Download Order Log</button>
+
+    <div id="output">Status will appear here...</div>
+
+    <h3>Load Order from IPFS</h3>
+    <input type="text" id="ipfsUrl" placeholder="Paste full IPFS URL">
+    <button id="loadFromIpfs" class="btn-blue">Load from IPFS</button>
+    <div id="ipfsLoadOutput">IPFS load result will appear here...</div>
+
+    <h3>Verify Signature</h3>
+    <textarea id="verifyMessage" placeholder="Paste signed message"></textarea>
+    <textarea id="verifySignature" placeholder="Paste signature"></textarea>
+    <button id="verifyBtn" class="btn-blue">Verify</button>
+    <div id="verifyOutput">Verification result will appear here...</div>
+
+    <div id="timeline"></div>
+  </div>
+
+  <script>
+    const customerSection = document.getElementById("customerSection");
+    const storeSection = document.getElementById("storeSection");
+
+    document.getElementById("showCustomer").onclick = () => {
+      customerSection.classList.add("visible");
+      storeSection.classList.remove("visible");
+    };
+
+    document.getElementById("showStore").onclick = () => {
+      storeSection.classList.add("visible");
+      customerSection.classList.remove("visible");
+    };
+
+    // Show customer by default
+    window.onload = () => {
+      document.getElementById("showCustomer").click();
+    };
+  </script>
+
+  <!-- Load logic -->
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+  <script src="customer.js"></script>
+</body>
+</html>
